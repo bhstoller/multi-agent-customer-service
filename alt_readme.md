@@ -1,47 +1,12 @@
 # Multi-Agent Customer Service System
 
-**Assignment: Multi-Agent Customer Service System with A2A and MCP**
+A production-ready agent-to-agent (A2A) communication system using Google's Agent Development Kit (ADK) and A2A SDK. This system demonstrates how multiple specialized AI agents can coordinate to handle complex customer service queries through intelligent routing and orchestration.
 
-A production-ready agent-to-agent (A2A) communication system using Google's Agent Development Kit (ADK) and A2A SDK. This implementation fulfills **all assignment requirements** through coordinated multi-agent task allocation, MCP integration, and A2A protocol implementation.
-
----
-
-## Part 1: System Architecture ✓
-
-This project implements a **three-agent system** as required:
-
-### 1. Router Agent (Orchestrator)
-- **Location**: `src/router.py` - `RouterOrchestrator` class
-- **Responsibilities**:
-  - ✅ Receives customer queries
-  - ✅ Analyzes query intent using LLM
-  - ✅ Routes to appropriate specialist agent
-  - ✅ Coordinates responses from multiple agents
-  - ✅ Synthesizes final response
-- **Implementation**: Uses Google Gemini to intelligently decide which agents to call and how to coordinate them
-
-### 2. Customer Data Agent (Specialist)
-- **Location**: `src/agents.py` - `customer_data_agent`
-- **Responsibilities**:
-  - ✅ Accesses customer database via MCP
-  - ✅ Retrieves customer information
-  - ✅ Updates customer records
-  - ✅ Handles data validation
-- **MCP Tools Used**: `get_customer`, `list_customers`, `update_customer`, `create_ticket`, `get_customer_history`
-
-### 3. Support Agent (Specialist)
-- **Location**: `src/agents.py` - `support_agent`
-- **Responsibilities**:
-  - ✅ Handles customer support queries
-  - ✅ Can escalate complex issues
-  - ✅ Requests customer context from Data Agent
-  - ✅ Provides solutions and recommendations
-
-### System Architecture Diagram
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│    Router Agent (Orchestrator)                          │
+│         Router Orchestrator (LLM-powered)               │
 │  - Analyzes user queries                                │
 │  - Routes to appropriate agents                         │
 │  - Coordinates multi-agent workflows                    │
@@ -51,233 +16,70 @@ This project implements a **three-agent system** as required:
         │ Customer Data     │  │ Support Agent      │
         │ Agent (10020)     │  │ (10021)            │
         │                  │  │                    │
-        │ A2A Communication│  │ A2A Communication  │
+        │ - get_customer   │  │ - Advice           │
+        │ - list_customers │  │ - Troubleshooting  │
+        │ - update_customer│  │ - Escalation       │
+        │ - create_ticket  │  │                    │
+        │ - get_history    │  │                    │
         └────────┬─────────┘  └─────┬──────────────┘
                  │                  │
         ┌────────▼──────────────────▼────────┐
-        │    MCP Server (src/mcp_server.py)   │
-        │    - Exposes 5 required tools       │
+        │    MCP Server (Flask)               │
         │    - Database operations            │
+        │    - MCP tool exposure              │
         │    - SQLite (support.db)            │
         └─────────────────────────────────────┘
 ```
 
----
+## Components
 
-## Part 2: MCP Integration ✓
+### 1. **config.py**
+Centralized configuration management:
+- Google API key and LLM model settings
+- Server URLs and ports (for A2A communication)
+- Database path configuration
+- Ngrok settings for public tunneling
+- Environment variable handling
 
-**Location**: `src/mcp_server.py`
+### 2. **agents.py**
+Agent definitions using Google ADK:
+- **Customer Data Agent**: Handles customer information, tickets, and database operations
+- **Support Agent**: Provides support advice and escalation guidance
+- Includes agent instructions/system prompts
+- MCP tool definitions for each agent
 
-Implements a Flask-based MCP server with **all 5 required tools**:
+### 3. **mcp_server.py**
+Flask-based MCP server:
+- Exposes database operations as MCP tools
+- Handles JSON-RPC requests from agents
+- Supports ngrok for public URL exposure
+- Tools: `get_customer`, `list_customers`, `update_customer`, `create_ticket`, `get_customer_history`
 
-### Required Tools Implemented
+### 4. **router.py**
+Orchestration logic:
+- **A2ASimpleClient**: Manages agent-to-agent HTTP communication
+- **RouterOrchestrator**: LLM-powered router that:
+  - Analyzes user queries
+  - Decides which agents to call
+  - Coordinates multi-step workflows
+  - Synthesizes final responses
 
-1. **get_customer(customer_id)** ✓
-   - Retrieves customer record by ID
-   - Uses: `customers.id` (primary key)
-   - Returns: Full customer details
-
-2. **list_customers(status, limit)** ✓
-   - Lists customers filtered by status
-   - Uses: `customers.status` ('active' or 'disabled')
-   - Returns: List of matching customers
-
-3. **update_customer(customer_id, data)** ✓
-   - Updates customer fields
-   - Uses: All `customers` fields (name, email, phone, etc.)
-   - Returns: Updated customer record
-
-4. **create_ticket(customer_id, issue, priority)** ✓
-   - Creates support ticket
-   - Uses: `tickets` table fields
-   - Returns: New ticket details
-
-5. **get_customer_history(customer_id)** ✓
-   - Retrieves all tickets for customer
-   - Uses: `tickets.customer_id` (foreign key)
-   - Returns: Complete ticket history
-
-### Database Schema ✓
-
-**Customers Table** (created by `database_setup.py`):
-```sql
-CREATE TABLE customers (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    email TEXT,
-    phone TEXT,
-    status TEXT CHECK(status IN ('active', 'disabled')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-```
-
-**Tickets Table** (created by `database_setup.py`):
-```sql
-CREATE TABLE tickets (
-    id INTEGER PRIMARY KEY,
-    customer_id INTEGER NOT NULL,
-    issue TEXT NOT NULL,
-    status TEXT CHECK(status IN ('open', 'in_progress', 'resolved')),
-    priority TEXT CHECK(priority IN ('low', 'medium', 'high')),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(customer_id) REFERENCES customers(id)
-)
-```
-
-### MCP Server Details
-- **Framework**: Flask with Server-Sent Events (SSE)
-- **Protocol**: JSON-RPC 2.0
-- **Public Access**: ngrok tunnel support
-- **Error Handling**: Comprehensive error responses for all tools
-
----
-
-## Part 3: A2A Coordination ✓
-
-**Approach Used**: Lab Notebook Approach (Extended)
-
-Implementation uses the A2A coordination pattern from the provided lab notebook, extended with more complex patterns.
-
-### A2ASimpleClient Implementation
-**Location**: `src/router.py` - `A2ASimpleClient` class
-
-Handles agent-to-agent HTTP communication:
-- Fetches agent card metadata
-- Manages agent caching
-- Implements proper timeout handling
-- Sends messages following A2A SDK pattern
-
-### RouterOrchestrator Coordination
-**Location**: `src/router.py` - `RouterOrchestrator` class
-
-Implements intelligent routing:
-- Analyzes user intent with LLM
-- Decides which agents to call
-- Manages agent communication
-- Coordinates multi-step workflows
-
----
-
-## Test Scenarios ✓
-
-All **5 required test scenarios** are implemented in `agent_to_agent_demo.ipynb`:
-
-### Scenario 1: Task Allocation ✓
-**Query**: "Get customer information for customer ID 5"
-
-**A2A Flow**:
-1. Router Agent receives query
-2. Router analyzes: "This requires customer data"
-3. Router → Customer Data Agent: "Get customer info for ID 5"
-4. Customer Data Agent calls MCP: `get_customer(5)`
-5. Customer Data Agent → Router: Returns customer data
-6. Router returns final response
-
-**Demonstrated in**: `test_scenario1` cell
-
-### Scenario 2: Negotiation/Escalation ✓
-**Query**: "I want to cancel my subscription but I'm having billing issues. My customer ID is 1."
-
-**A2A Flow**:
-1. Router detects multiple intents: cancellation + billing issue
-2. Router → Customer Data Agent: "Get customer 1 info"
-3. Customer Data Agent returns: Customer details + ticket history
-4. Router → Support Agent: "Customer wants to cancel but has billing issues"
-5. Support Agent → Router: "Create escalation ticket"
-6. Router → Customer Data Agent: "Create high-priority ticket"
-7. Agents coordinate final response
-
-**Demonstrated in**: `test_scenario2` cell
-
-### Scenario 3: Multi-Step Coordination ✓
-**Query**: "Show me the names of all active customers who have closed tickets."
-
-**A2A Flow**:
-1. Router decomposes query: "Need customer list + ticket filtering"
-2. Router → Customer Data Agent: "List all active customers"
-3. Customer Data Agent returns: List of 12 active customers
-4. Router → Customer Data Agent: "Get ticket history for IDs: 1,2,3..."
-5. Customer Data Agent returns: All tickets for those customers
-6. Router filters: Only customers with closed tickets
-7. Router synthesizes: List of customer names
-
-**Demonstrated in**: `test_scenario3` cell
-
----
-
-## Deliverables ✓
-
-### 1. Code Repository (GitHub) ✓
-**Location**: https://github.com/bhstoller/multi-agent-customer-service
-
-- ✅ **MCP Server Implementation**: `src/mcp_server.py`
-  - Flask server with 5 required tools
-  - Database operations
-  - Error handling and logging
-
-- ✅ **Agent Implementations**: `src/agents.py`
-  - Customer Data Agent with MCP integration
-  - Support Agent with escalation logic
-  - Agent cards and instructions
-
-- ✅ **Configuration & Deployment**: 
-  - `src/config.py` - Centralized configuration
-  - `src/router.py` - A2A coordination logic
-  - `database_setup.py` - Database initialization
-  - `requirements.txt` - All dependencies listed
-
-- ✅ **README.md** (This file)
-  - Complete setup instructions
-  - Python venv separation documented
-  - Clear requirements.txt with all packages
-
-### 2. Colab Notebook ✓
-**Location**: `agent_to_agent_demo.ipynb`
-
-**Demonstrates**:
-- ✅ End-to-end system execution
-- ✅ 3+ test scenarios with A2A coordination
-- ✅ Proper output capture showing:
-  - User queries
-  - Router decision process
-  - A2A communication between agents
-  - Final responses
-- ✅ All agents working together
-- ✅ MCP tool calls visible in output
-
-**Sample Output**:
-```
-========================================================
- USER QUERY: Get customer information for customer ID 5
-========================================================
-
-[ROUTER STEP 1]: The user is asking for information about a specific customer...
-   >>> [A2A CALL] Connecting to customer_data at http://localhost:10020...
-   <<< [A2A RESPONSE]: Customer details returned...
-
-[ROUTER]: Task Complete.
-
-FINAL RESPONSE:
-Customer information for ID 5:
-Name: Charlie Brown
-Email: charlie.brown@email.com
-Phone: +1-555-0105
-Status: active
-```
-
----
+### 5. **database_setup.py**
+Initializes SQLite database with:
+- Customer table (name, email, phone, status)
+- Tickets table (customer_id, issue, status, priority)
+- Test data for demonstration
 
 ## Setup & Installation
 
 ### Prerequisites
 - Python 3.11+
-- Google API key (https://aistudio.google.com/app/apikey)
-- Optional: Ngrok token for public URL exposure
+- Google API key (get one at https://aistudio.google.com/app/apikey)
+- Optional: Ngrok account for public URL exposure
 
 ### Local Installation
 
-1. **Clone repository:**
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/bhstoller/multi-agent-customer-service.git
    cd multi-agent-customer-service
@@ -285,154 +87,267 @@ Status: active
 
 2. **Create virtual environment:**
    ```bash
-   conda create -n multi-agent python=3.11
-   conda activate multi-agent
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-1. **Install dependencies:**
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Create `.env` file:**
+4. **Create `.env` file:**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your configuration:
    ```
    GOOGLE_API_KEY=your_api_key_here
    MCP_SERVER_URL=http://localhost:10020/mcp
    NGROK_AUTHTOKEN=your_ngrok_token_here  # Optional
    ```
 
-3. **Initialize database:**
+5. **Initialize database:**
    ```bash
    python database_setup.py
    ```
 
-### Running the System
+## Running the System
+
+### Option 1: Local Development (Two Terminals)
 
 **Terminal 1 - Start MCP Server:**
 ```bash
 python src/mcp_server.py
 ```
+Output:
+```
+Starting MCP Server...
+✓ Agent servers initialized
+Starting Flask server on 0.0.0.0:10020...
+```
 
-**Terminal 2 - Run Demo:**
+**Terminal 2 - Run Demo Notebook:**
 ```bash
 jupyter notebook agent_to_agent_demo.ipynb
 ```
 
-Or run in Google Colab with secrets configured.
+### Option 2: Google Colab (Recommended for Demo)
 
----
+1. Open `agent_to_agent_demo.ipynb` in Google Colab
+2. Add to Colab Secrets:
+   - `a5-key`: Your Google API key
+   - `MCP_SERVER_URL`: Your MCP server URL (ngrok or localhost)
+3. Run cells sequentially
+4. The notebook will automatically start agent servers
 
-## Project Structure
+## Usage Examples
+
+### Simple Query (Single Agent)
+```python
+query = "Get customer information for customer ID 5"
+
+# Router analyzes query → calls Customer Data Agent → returns customer details
+result = await router.process_query(query)
+```
+
+### Multi-Agent Coordination
+```python
+query = "I want to cancel my subscription but I'm having billing issues. My customer ID is 1."
+
+# Router coordinates:
+# 1. Calls Customer Data Agent to get customer info and ticket history
+# 2. Calls Support Agent for escalation guidance
+# 3. Creates high-priority support ticket
+# 4. Returns coordinated response to customer
+result = await router.process_query(query)
+```
+
+### Complex Multi-Step Query
+```python
+query = "Show me the names of all active customers who have closed tickets."
+
+# Router decomposes query:
+# 1. Gets list of active customers
+# 2. Retrieves ticket history for all customers
+# 3. Filters for closed tickets
+# 4. Returns aggregated report
+result = await router.process_query(query)
+```
+
+## API Reference
+
+### MCP Tools
+
+**get_customer(customer_id: int)**
+- Returns customer record by ID
+- Example: `{"customer": {"id": 5, "name": "Charlie Brown", ...}}`
+
+**list_customers(status: str = None)**
+- Lists customers, optionally filtered by status ("active" or "disabled")
+- Returns: `{"customers": [...], "count": 5}`
+
+**update_customer(customer_id: int, name: str = None, email: str = None, phone: str = None)**
+- Updates customer information
+- Returns updated customer record
+
+**create_ticket(customer_id: int, issue: str, priority: str)**
+- Creates support ticket for customer
+- Priority: "low", "medium", "high"
+- Returns: `{"ticket": {...}, "success": true}`
+
+**get_customer_history(customer_id: int)**
+- Returns all tickets for a customer
+- Returns: `{"history": [...], "count": 5}`
+
+### Router Methods
+
+**async router.process_query(user_query: str) → str**
+- Processes user query through router orchestrator
+- Returns final response string
+- Max 15 reasoning steps per query
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GOOGLE_API_KEY` | Required | Google Generative AI API key |
+| `MCP_SERVER_URL` | Required | Base URL for MCP server |
+| `LLM_MODEL` | `gemini-2.0-flash` | Model to use for LLM |
+| `NGROK_AUTHTOKEN` | Optional | Ngrok auth token for public URL |
+| `DB_PATH` | `support.db` | Path to SQLite database |
+| `LOG_LEVEL` | `INFO` | Logging level |
+| `DEBUG` | `false` | Enable debug mode |
+
+### Server Ports
+
+- **Customer Data Agent**: `10020`
+- **Support Agent**: `10021`
+- **Router Agent**: `10040` (not used in current setup)
+
+## File Structure
 
 ```
 multi-agent-customer-service/
 ├── README.md                    # This file
-├── requirements.txt             # Python venv packages
-├── .gitignore                   # Git configuration
+├── requirements.txt             # Python dependencies
+├── .gitignore                   # Git ignore rules
 ├── LICENSE                      # MIT License
-├── database_setup.py            # Creates database + test data
-├── agent_to_agent_demo.ipynb    # End-to-end demo with 3+ scenarios
-│
-└── src/                         # Python venv separation
-    ├── __init__.py
-    ├── config.py                # Part 1: Configuration
-    ├── agents.py                # Part 1: Agent definitions
-    ├── mcp_server.py            # Part 2: MCP server implementation
-    └── router.py                # Part 3: A2A coordination
+├── database_setup.py            # Database initialization
+├── agent_to_agent_demo.ipynb    # Demo notebook
+├── src/
+│   ├── __init__.py
+│   ├── config.py                # Configuration management
+│   ├── agents.py                # Agent definitions
+│   ├── mcp_server.py            # MCP server implementation
+│   └── router.py                # Router orchestration
+└── notebooks/                   # Reference notebooks (optional)
 ```
 
----
+## Development
 
-## Key Implementation Highlights
+### Adding a New Agent
 
-### Part 1 Highlights
-- ✅ Three agent system: Router, Customer Data, Support
-- ✅ Clear role separation and coordination
-- ✅ Explicit agent instructions for each role
+1. Define agent in `src/agents.py`:
+```python
+new_agent = Agent(
+    name="new_agent",
+    instructions="Your agent instructions...",
+)
+new_agent_card = AgentCard(agent=new_agent)
+```
 
-### Part 2 Highlights
-- ✅ Five MCP tools implemented
-- ✅ Full database schema implementation
-- ✅ Proper error handling per tool
-- ✅ JSON-RPC protocol compliance
+2. Add to router configuration in `src/router.py`
+3. Define tools and capabilities in agent instructions
 
-### Part 3 Highlights
-- ✅ A2ASimpleClient with proper HTTP communication
-- ✅ LLM-powered intelligent routing
-- ✅ Multi-step agent coordination
-- ✅ Explicit logging of A2A calls
-- ✅ Handles all three coordination scenarios
+### Adding a New MCP Tool
 
----
+1. Implement function in `src/mcp_server.py`:
+```python
+def my_tool(param: str) -> Dict[str, Any]:
+    """Tool description"""
+    return {"result": "..."}
+```
+
+2. Add to `MCP_TOOLS` list with schema
+3. Add to `tool_functions` in `handle_tools_call()`
+
+## Performance Notes
+
+- **Ngrok**: Uses free tier (limited bandwidth, random URLs restart)
+- **Query Complexity**: Max 15 reasoning steps per query
+- **Database**: SQLite suitable for demos; use PostgreSQL for production
+- **Concurrency**: Single-threaded; use async for multiple queries
+
+## Troubleshooting
+
+### "MCP_SERVER_URL not set"
+- Check `.env` file exists in repo root
+- Verify `MCP_SERVER_URL` is set and accessible
+- For Colab: Add `MCP_SERVER_URL` to Colab Secrets
+
+### "Port 10020 already in use"
+```bash
+# Kill existing process
+lsof -i :10020
+kill -9 <PID>
+```
+
+### "Agent server connection failed"
+- Ensure MCP server is running: `python src/mcp_server.py`
+- Check ngrok tunnel is active: `ngrok http 10020`
+- Verify firewall allows connections
+
+### "Database file not found"
+- Run initialization: `python database_setup.py`
+- Check `DB_PATH` in `.env`
 
 ## Dependencies
 
-Key packages installed via `requirements.txt`:
-- `google-adk>=1.9.0` - Agent Development Kit
+Key packages:
+- `google-adk>=1.9.0` - Google Agent Development Kit
 - `a2a-sdk>=0.3.0` - Agent-to-Agent SDK
-- `google-generativeai>=0.5.0` - Gemini API
+- `google-generativeai>=0.5.0` - Google Gemini API
 - `flask>=2.3.0` - MCP server framework
 - `uvicorn>=0.24.0` - ASGI server
 - `httpx>=0.25.0` - Async HTTP client
-- `pyngrok>=5.2.0` - ngrok support
+- `pyngrok>=5.2.0` - Ngrok Python bindings
 
-**Python Version**: 3.11+
-**Virtual Environment**: Yes (venv)
-
----
-
-## Lessons Learned & Challenges
-
-### What I Learned
-1. **Agent Coordination Complexity**: Managing state and information flow between agents requires careful planning. The A2A pattern provides good abstractions but demands explicit communication protocols.
-
-2. **MCP as a Bridge**: The MCP server acts as a critical interface between agents and external tools. Proper tool definition, error handling, and timeout management are essential for reliability.
-
-3. **LLM-Powered Routing**: Using an LLM to decide routing provides flexibility but requires careful prompt engineering to ensure agents are called appropriately and consistently.
-
-4. **Debugging Multi-Agent Systems**: With multiple agents running asynchronously, debugging requires comprehensive logging at every coordination point. Without it, issues are nearly impossible to trace.
-
-### Challenges Overcome
-1. **A2A Communication**: Initial challenge was understanding the A2A SDK's HTTP communication pattern. Solved by implementing a robust `A2ASimpleClient` with proper timeout and error handling.
-
-2. **State Management**: Tracking information flow between agents (who knows what) was complex. Solved by maintaining message history and explicit logging of all agent calls.
-
-3. **MCP Tool Reliability**: Tools occasionally timed out or failed silently. Solved by implementing comprehensive error handling, validation, and response formatting in each tool.
-
-4. **ngrok URL Stability**: Ngrok tunnels would close between runs. Solved by implementing `ngrok.kill()` before creating new tunnels, ensuring clean connections.
-
-5. **Agent Consistency**: Agents sometimes made different decisions with similar queries. Solved by refining system instructions with concrete examples and constraints.
-
----
-
-## Assignment Completion Checklist
-
-- [x] **Part 1**: Three-agent system (Router, Customer Data, Support)
-- [x] **Part 2**: MCP server with 5 required tools
-- [x] **Part 2**: Database schema fully implemented
-- [x] **Part 3**: A2A coordination using lab notebook approach (extended)
-- [x] **Scenario 1**: Task allocation demonstrated
-- [x] **Scenario 2**: Negotiation/escalation demonstrated
-- [x] **Scenario 3**: Multi-step coordination demonstrated
-- [x] **Test Cases**: All 5 required queries handled
-- [x] **Deliverable 1**: GitHub repo with code, config, README
-- [x] **Deliverable 2**: Colab notebook with 3+ scenarios
-- [x] **Deliverable 3**: Conclusion (below)
-
----
-
-## Repository
-
-**GitHub**: https://github.com/bhstoller/multi-agent-customer-service
-
-All code is public and ready for review.
-
----
+See `requirements.txt` for full list.
 
 ## License
 
 MIT License - see LICENSE file for details
 
+## Author
+
+Bradley Stoller
+
+## Contributing
+
+Pull requests welcome! Please ensure:
+- Code follows existing style
+- All imports are used
+- Documentation is updated
+- Tests pass
+
+## Resources
+
+- [Google ADK Documentation](https://ai.google.dev/docs/adk)
+- [A2A SDK Documentation](https://github.com/google/ai-agent-sdk)
+- [Google Generative AI](https://ai.google.dev)
+- [Ngrok Documentation](https://ngrok.com/docs)
+
+## Support
+
+For issues or questions:
+1. Check troubleshooting section above
+2. Open an issue on GitHub
+3. Review notebook examples in `agent_to_agent_demo.ipynb`
+
 ---
 
-*Assignment completed: November 2025*
+**Last Updated**: November 2025
