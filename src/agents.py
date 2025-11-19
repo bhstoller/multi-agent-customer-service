@@ -1,6 +1,4 @@
 """
-Agent definitions for Multi-Agent Customer Service System.
-
 This module contains all of the agent configurations, instructions, and agent cards
 for the three specialized agents in the system:
 - Customer Data Agent: Handles all customer data requests via the MCP Server Tools
