@@ -23,6 +23,13 @@ GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', '')
 # SERVER CONFIGURATION
 # ============================================================================
 
+# Ngrok configuration (for exposing local server publicly)
+NGROK_AUTHTOKEN = os.getenv('NGROK_AUTHTOKEN', '')
+"""Ngrok auth token for exposing servers publicly."""
+
+USE_NGROK = bool(NGROK_AUTHTOKEN)
+"""Whether to use ngrok for exposing servers."""
+
 # MCP Server
 MCP_SERVER_URL = os.getenv('MCP_SERVER_URL')
 """Base URL for MCP server. Set via MCP_SERVER_URL env var or auto-constructed."""
@@ -106,6 +113,7 @@ if __name__ == '__main__':
     print("Current Configuration:")
     print(f"  Google API Key: {'***' if GOOGLE_API_KEY else 'NOT SET'}")
     print(f"  MCP Server URL: {MCP_SERVER_URL}")
+    print(f"  Ngrok Enabled: {USE_NGROK}")
     print(f"  Router URL: {ROUTER_URL}")
     print(f"  Support URL: {SUPPORT_URL}")
     print(f"  Customer Data URL: {CUSTOMER_DATA_URL}")
