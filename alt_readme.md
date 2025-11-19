@@ -285,23 +285,23 @@ Status: active
 
 2. **Create virtual environment:**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   conda create -n multi-agent python=3.11
+   conda activate multi-agent
    ```
 
-3. **Install dependencies:**
+1. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Create `.env` file:**
+2. **Create `.env` file:**
    ```
    GOOGLE_API_KEY=your_api_key_here
    MCP_SERVER_URL=http://localhost:10020/mcp
    NGROK_AUTHTOKEN=your_ngrok_token_here  # Optional
    ```
 
-5. **Initialize database:**
+3. **Initialize database:**
    ```bash
    python database_setup.py
    ```
