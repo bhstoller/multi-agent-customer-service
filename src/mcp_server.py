@@ -1,18 +1,17 @@
 """
-MCP Server for Customer Management System.
-
-This module provides a Flask-based MCP (Model Context Protocol) server that exposes
-customer management operations through standardized tools:
+This module provides the Flask-based MCP server for the
+customer management tools. Specifically, it includes:
 - get_customer: Retrieve customer by ID
 - list_customers: List customers with optional status filter
 - update_customer: Update customer information
 - create_ticket: Create a support ticket
 - get_customer_history: Get ticket history for a customer
 
-The server implements the MCP protocol for JSON-RPC communication.
-Optionally exposes the server via ngrok for public access.
+The server implements the MCP protocol via ngrok for public access 
+on Google Colab notebooks.
 """
 
+# Imports
 import sqlite3
 import json
 import logging
@@ -31,26 +30,28 @@ if USE_NGROK:
             "Install it with: pip install pyngrok"
         )
 
-# ============================================================================
+# ======================================================================================
 # LOGGING SETUP
-# ============================================================================
+# ======================================================================================
+# This sets up logging for the MCP server, just like we did it in the 
+# a2a_quickstart.ipynb notebook from the hands on lab
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level= logging.INFO,
+    format= '%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Suppress verbose logging from dependencies
+# Suppress verbose logging for better readability
 logging.getLogger('flask').setLevel(logging.WARNING)
 logging.getLogger('werkzeug').setLevel(logging.WARNING)
 logging.getLogger('pyngrok').setLevel(logging.WARNING)
 logging.getLogger('urllib3').setLevel(logging.WARNING)
 
-# ============================================================================
+# ======================================================================================
 # DATABASE HELPER FUNCTIONS
-# ============================================================================
-
+# ======================================================================================
+# Define the helper functions that interact with the SQLite database
 
 def get_db_connection():
     """
@@ -62,7 +63,6 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-
 
 def row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
     """
@@ -77,10 +77,12 @@ def row_to_dict(row: sqlite3.Row) -> Dict[str, Any]:
     return {key: row[key] for key in row.keys()}
 
 
-# ============================================================================
+# ======================================================================================
 # READ OPERATIONS
-# ============================================================================
-
+# ======================================================================================
+# Define the functions that read/retrieve data from the database
+# Reuses the get_customer and list_customers functions from mcp_customer_demo.ipynb
+# Creates get_customer_history function
 
 def get_customer(customer_id: int) -> Dict[str, Any]:
     """
@@ -115,7 +117,6 @@ def get_customer(customer_id: int) -> Dict[str, Any]:
             'success': False,
             'error': f'Database error: {str(e)}'
         }
-
 
 def list_customers(status: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -157,7 +158,6 @@ def list_customers(status: Optional[str] = None) -> Dict[str, Any]:
             'error': f'Database error: {str(e)}'
         }
 
-
 def get_customer_history(customer_id: int) -> Dict[str, Any]:
     """
     Retrieve complete ticket history for a customer.
@@ -196,10 +196,11 @@ def get_customer_history(customer_id: int) -> Dict[str, Any]:
         }
 
 
-# ============================================================================
+# ======================================================================================
 # UPDATE OPERATIONS
-# ============================================================================
-
+# ======================================================================================
+# Define the functions that update data in the database
+# Reuses the update_customer function from mcp_customer_demo.ipynb
 
 def update_customer(customer_id: int, name: Optional[str] = None,
                    email: Optional[str] = None, phone: Optional[str] = None) -> Dict[str, Any]:
@@ -275,10 +276,12 @@ def update_customer(customer_id: int, name: Optional[str] = None,
         }
 
 
-# ============================================================================
+# ======================================================================================
 # CREATE OPERATIONS
-# ============================================================================
-
+# ======================================================================================
+# Define the functions that create new data in the database
+# Creates a new function called create_ticket 
+# (mimics the add_customer function logic from mcp_customer_demo.ipynb)
 
 def create_ticket(customer_id: int,
                   issue: str,
@@ -328,9 +331,11 @@ def create_ticket(customer_id: int,
         }
 
 
-# ============================================================================
+# ======================================================================================
 # MCP TOOL DEFINITIONS
-# ============================================================================
+# ======================================================================================
+# Defines the tools that will be exposed via the MCP server
+# Mimics the logic from the mcp_customer_demo.ipynb notebook
 
 MCP_TOOLS: List[Dict[str, Any]] = [
     {
@@ -431,30 +436,20 @@ MCP_TOOLS: List[Dict[str, Any]] = [
 # ============================================================================
 # MCP MESSAGE HANDLERS
 # ============================================================================
-
+# Defines the functions that handle incoming MCP messages
+# Uses the functions from the mcp_customer_demo.ipynb notebook
 
 def create_sse_message(data: Dict[str, Any]) -> str:
     """
     Format a message for Server-Sent Events (SSE).
-
-    Args:
-        data: A dictionary containing the MCP response payload.
-
-    Returns:
-        A formatted SSE string containing the JSON-encoded payload.
+    SSE format: 'data: {json}\n\n'
     """
     return f"data: {json.dumps(data)}\n\n"
 
-
 def handle_initialize(message: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Handle an MCP initialize request.
-
-    Args:
-        message: The incoming MCP initialize request.
-
-    Returns:
-        A dictionary representing the MCP initialize response.
+    Handle MCP initialize request.
+    This is the first message in the MCP protocol handshake.
     """
     return {
         "jsonrpc": "2.0",
@@ -469,16 +464,10 @@ def handle_initialize(message: Dict[str, Any]) -> Dict[str, Any]:
         }
     }
 
-
 def handle_tools_list(message: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Return the list of available MCP tools.
-
-    Args:
-        message: The incoming MCP request.
-
-    Returns:
-        A dictionary containing the list of MCP tools.
+    Handle tools/list request.
+    Returns the list of available tools.
     """
     return {
         "jsonrpc": "2.0",
@@ -486,16 +475,10 @@ def handle_tools_list(message: Dict[str, Any]) -> Dict[str, Any]:
         "result": {"tools": MCP_TOOLS}
     }
 
-
 def handle_tools_call(message: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Execute a requested MCP tool.
-
-    Args:
-        message: The incoming MCP tools/call request.
-
-    Returns:
-        A dictionary containing the tool execution result.
+    Handle tools/call request.
+    Executes the requested tool and returns the result.
     """
     params = message.get("params", {})
     tool_name: str = params.get("name")
@@ -543,16 +526,9 @@ def handle_tools_call(message: Dict[str, Any]) -> Dict[str, Any]:
             }
         }
 
-
 def process_mcp_message(message: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Route an MCP request to the appropriate handler.
-
-    Args:
-        message: The incoming MCP request.
-
-    Returns:
-        A dictionary containing the MCP response.
+    Process an MCP message and route it to the appropriate handler.
     """
     method: str = message.get("method")
 
@@ -576,7 +552,8 @@ def process_mcp_message(message: Dict[str, Any]) -> Dict[str, Any]:
 # ============================================================================
 # FLASK APPLICATION
 # ============================================================================
-
+# Defines the Flask application that serves as the MCP endpoints
+# Mimics the Flask setup from mcp_customer_demo.ipynb notebook
 
 def create_app() -> Flask:
     """
@@ -637,7 +614,7 @@ def create_app() -> Flask:
 # ============================================================================
 # ENTRY POINT
 # ============================================================================
-
+# Starts the Flask MCP server with ngrok when the script is run
 
 if __name__ == "__main__":
     print("Starting MCP Server...")
@@ -658,19 +635,18 @@ if __name__ == "__main__":
             ngrok.kill()
             print("Cleaned up existing ngrok tunnels")
         except Exception:
-            pass  # No existing tunnels, that's fine
+            pass
         
         try:
             public_url = ngrok.connect(10020)
-            print(f"✓ ngrok tunnel established")
-            print(f"✓ Public URL: {public_url}")
-            print(f"✓ MCP_SERVER_URL: {public_url}/mcp")
+            print(f"Ngrok tunnel established")
+            print(f"Public URL: {public_url}")
+            print(f"MCP_SERVER_URL: {public_url}/mcp")
         except Exception as e:
-            print(f"✗ Failed to setup ngrok: {e}")
+            print(f"Failed to setup ngrok: {e}")
             print("Falling back to localhost...")
     else:
-        print("\nngrok not configured. Running on localhost only.")
-        print("To use ngrok, set NGROK_AUTHTOKEN in your .env file")
+        print("Ngrok not configured. Running on localhost only.")
     
     print("\nStarting Flask server on 0.0.0.0:10020...")
     app.run(host="0.0.0.0", port=10020, debug=False, use_reloader=False)
