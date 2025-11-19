@@ -1,24 +1,26 @@
-# MCP Server Modules
-mcp>=0.1.4
-fastmcp>=0.1.4
+# Multi-Agent Customer Service System - Dependencies
 
-# LLM Access Modules
-openai>=1.42.0
+# Core Google ADK and A2A
+google-adk==1.9.0
+a2a-sdk==0.3.0
+google-genai>=0.4.0
 
-# LangChain (A2A Coordination Framework)
-langchain>=0.2.0
-langchain-core>=0.2.0
-langchain-openai>=0.1.0
-langchain-community>=0.2.0
+# Async HTTP and networking
+httpx>=0.25.0
+aiohttp>=3.9.0
+nest-asyncio>=1.5.8
 
-# LangGraph Modules
-langgraph>=0.1.0
+# Web framework for MCP server
+flask>=2.3.0
+flask-cors>=4.0.0
+uvicorn>=0.24.0
 
-# Logging + Debugging Modules
-rich
-python-dotenv
+# API and HTTP client
+requests>=2.31.0
 
-# General Notebook Modules
-jupyter
-ipykernel
-pydantic>=2.0
+# Environment variables
+python-dotenv>=1.0.0
+
+# Utilities
+termcolor>=2.3.0
+pyngrok>=5.2.0
