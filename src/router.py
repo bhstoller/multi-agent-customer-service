@@ -19,7 +19,7 @@ from config import LLM_MODEL, CUSTOMER_DATA_URL, SUPPORT_URL
 # A2A CLIENT
 # ======================================================================================
 # The A2A client handles communication with remote agents via HTTP. The code is exactly 
-# the same as the code provided in the hands on labs from class.
+# the same as the code provided in the hands on labs from class
 
 class A2ASimpleClient:
     """A2A Simple to call A2A servers."""
@@ -101,9 +101,9 @@ class A2ASimpleClient:
 # ============================================================================
 # ROUTER ORCHESTRATOR
 # ============================================================================
-# This is a custom class that I built to implement the Router agent logic.
+# This is a custom class that I built to implement the Router agent logic
 # The router uses an LLM to analyze user queries, decide whether to call the 
-# customer data agent or support agent (or both), and synthesize the result.
+# customer data agent or support agent (or both), and synthesize the result
 
 class RouterOrchestrator:
     """
