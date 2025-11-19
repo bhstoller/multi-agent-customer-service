@@ -8,6 +8,7 @@ sensible defaults.
 
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
@@ -51,7 +52,8 @@ CUSTOMER_DATA_URL = f'http://{CUSTOMER_DATA_HOST}:{CUSTOMER_DATA_PORT}'
 # DATABASE CONFIGURATION
 # ============================================================================
 
-DB_PATH = os.getenv('DB_PATH', 'support.db')
+REPO_ROOT = Path(__file__).parent.parent  # Go up from src/ to root
+DB_PATH = os.getenv('DB_PATH', str(REPO_ROOT / 'support.db'))
 """Path to SQLite database file."""
 
 # ============================================================================
