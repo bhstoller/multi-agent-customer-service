@@ -1,13 +1,14 @@
 """
 Agent definitions for Multi-Agent Customer Service System.
 
-This module contains all agent configurations, instructions, and agent cards
+This module contains all of the agent configurations, instructions, and agent cards
 for the three specialized agents in the system:
-- Customer Data Agent: Handles all customer data operations via MCP
-- Support Agent: Provides customer support and escalation
-- Router Orchestrator: Coordinates between agents (runs as client, not server)
+- Customer Data Agent: Handles all customer data requests via the MCP Server Tools
+- Support Agent: Handles all customer support and escalation requests
+- Router (Orchestrator): Facilitates the communication between customer data and support agents (runs as client, not server)
 """
 
+# Imports
 import os
 from google.adk.agents import Agent
 from google.adk.tools.mcp_tool import MCPToolset, StreamableHTTPConnectionParams
@@ -19,11 +20,12 @@ from a2a.types import (
 )
 from config import MCP_SERVER_URL, LLM_MODEL
 
-# ============================================================================
+# ======================================================================================
 # CUSTOMER DATA AGENT
-# ============================================================================
-# This agent interfaces directly with the MCP server to handle all customer
-# data operations: retrieval, updates, ticket creation, and history lookup.
+# ======================================================================================
+# The customer data agent connects directly with the MCP server to handle all
+# data operations including information retrieval, updates, and ticket creation
+CUSTOMER_DATA_AGENT_URL = "http://127.0.0.1:10020"
 
 CUSTOMER_DATA_AGENT_INSTRUCTION = """
 You are the Customer Data Agent.
@@ -51,40 +53,40 @@ AVAILABLE OPERATIONS:
 - get_customer_history(customer_id)
 
 ADDITIONAL RULES:
-- When updating a customer, preserve fields not being modified.
+- When updating a customer, preserve any fields that are not being modified.
 - When creating a ticket, always include created_at returned by MCP.
-- When listing customers, return array of customer objects.
+- When listing customers, return an array of customer objects.
 
 ALWAYS start with [CUSTOMER_DATA_AGENT]: then provide JSON.
 """
 
 customer_data_agent = Agent(
-    model=LLM_MODEL,
-    name="customer_data_agent",
-    tools=[
+    model= LLM_MODEL,
+    name= "customer_data_agent",
+    tools= [
         MCPToolset(
-            connection_params=StreamableHTTPConnectionParams(url=MCP_SERVER_URL)
+            connection_params= StreamableHTTPConnectionParams(url= MCP_SERVER_URL)
         )
     ],
-    instruction=CUSTOMER_DATA_AGENT_INSTRUCTION,
+    instruction= CUSTOMER_DATA_AGENT_INSTRUCTION,
 )
 
 customer_data_agent_card = AgentCard(
-    name="Customer Data Agent",
-    url="http://127.0.0.1:10020",
-    description="Fetches and updates customer data using MCP tools",
-    version="1.0",
-    capabilities=AgentCapabilities(streaming=False),
-    default_input_modes=["text/plain"],
-    default_output_modes=["application/json"],
-    preferred_transport=TransportProtocol.jsonrpc,
-    skills=[
+    name= "Customer Data Agent",
+    url= CUSTOMER_DATA_AGENT_URL,
+    description= "Fetches and updates customer data using MCP tools",
+    version= "1.0",
+    capabilities= AgentCapabilities(streaming=False),
+    default_input_modes= ["text/plain"],
+    default_output_modes= ["application/json"],
+    preferred_transport= TransportProtocol.jsonrpc,
+    skills= [
         AgentSkill(
-            id="customer_data_access",
-            name="Customer Data Access",
-            description="Retrieve and update customer records",
-            tags=["customer", "data", "database", "lookup"],
-            examples=[
+            id= "customer_data_access",
+            name= "Customer Data Access",
+            description= "Retrieve and update customer records",
+            tags= ["customer", "data", "database", "lookup"],
+            examples= [
                 "Get customer 42",
                 "Update customer 5 email",
                 "Show all customers",
@@ -93,11 +95,12 @@ customer_data_agent_card = AgentCard(
     ],
 )
 
-# ============================================================================
+# ======================================================================================
 # SUPPORT AGENT
-# ============================================================================
-# This agent handles customer support queries, troubleshooting, and escalations.
+# ======================================================================================
+# The support agent handles customer support queries, troubleshooting, and escalations.
 # It can request customer context from the Router when needed for support tasks.
+SUPPORT_AGENT_URL = "http://127.0.0.1:10021"
 
 SUPPORT_AGENT_INSTRUCTION = """
 You are the Support Agent.
@@ -145,21 +148,21 @@ support_agent = Agent(
 )
 
 support_agent_card = AgentCard(
-    name="Support Agent",
-    url="http://127.0.0.1:10021",
-    description="Handles general support questions and escalates to customer data agent when needed",
-    version="1.0",
-    capabilities=AgentCapabilities(streaming=True),
-    default_input_modes=["text/plain"],
-    default_output_modes=["text/plain"],
-    preferred_transport=TransportProtocol.jsonrpc,
-    skills=[
+    name= "Support Agent",
+    url= SUPPORT_AGENT_URL,
+    description= "Handles general support questions and escalates to customer data agent when needed",
+    version= "1.0",
+    capabilities= AgentCapabilities(streaming= True),
+    default_input_modes= ["text/plain"],
+    default_output_modes= ["text/plain"],
+    preferred_transport= TransportProtocol.jsonrpc,
+    skills= [
         AgentSkill(
-            id="customer_support",
-            name="Customer Support",
-            description="Provides general support responses",
-            tags=["support", "help", "troubleshooting"],
-            examples=[
+            id= "customer_support",
+            name= "Customer Support",
+            description= "Provides general support responses",
+            tags= ["support", "help", "troubleshooting"],
+            examples= [
                 "How do I reset my password?",
                 "What is your refund policy?",
                 "I need help with my account.",
@@ -168,12 +171,11 @@ support_agent_card = AgentCard(
     ],
 )
 
-# ============================================================================
+# ======================================================================================
 # ROUTER AGENT (Orchestrator)
-# ============================================================================
-# The Router doesn't run as an A2A server. It's a client orchestrator that
+# ======================================================================================
+# The Router agent doesn't run as an A2A server. Instead it is an orchestrator that
 # analyzes user queries and makes A2A calls to the specialist agents.
-# See router.py or your notebook for the RouterOrchestrator class.
 
 ROUTER_AGENT_INSTRUCTION = """
 You are the Router Agent - the orchestrator of the customer service system.
@@ -203,14 +205,15 @@ Always think step-by-step and announce each step with [ROUTER STEP X]:
 ALWAYS start responses with [ROUTER STEP 1]:
 """
 
-# Note: The router is not instantiated here because it doesn't run as an A2A server.
-# The RouterOrchestrator class is defined in your notebook or router.py
+# NOTE: The router is not instantiated here because it doesn't run as an A2A server.
+# The RouterOrchestrator class is defined the actual notebook where it called (agent_to_agent_demo.ipynb)
 
 
-# ============================================================================
-# Module exports for easy importing
-# ============================================================================
+# ======================================================================================
+# Module Export Shortcut
+# ======================================================================================
 
+# Setting a designation of all for easy importation of all the agents
 __all__ = [
     "customer_data_agent",
     "customer_data_agent_card",
@@ -223,9 +226,9 @@ __all__ = [
 
 
 if __name__ == "__main__":
-    # Debug: Print what was created
-    print("✓ customer_data_agent created")
-    print("✓ customer_data_agent_card created")
-    print("✓ support_agent created")
-    print("✓ support_agent_card created")
-    print("\nAgents module loaded successfully!")
+    # Confirm agent creation
+    print("Customer_data_agent created")
+    print("Customer_data_agent_card created")
+    print("Support_agent created")
+    print("Support_agent_card created")
+    print("\nAll agents from the agents module loaded successfully!")
