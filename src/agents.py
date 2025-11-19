@@ -96,8 +96,8 @@ customer_data_agent_card = AgentCard(
 # ======================================================================================
 # SUPPORT AGENT
 # ======================================================================================
-# The support agent handles customer support queries, troubleshooting, and escalations.
-# It can request customer context from the Router when needed for support tasks.
+# The support agent handles customer support queries, troubleshooting, and escalations
+# It can request customer context from the Router when needed for support tasks
 SUPPORT_AGENT_URL = "http://127.0.0.1:10021"
 
 SUPPORT_AGENT_INSTRUCTION = """
@@ -173,7 +173,7 @@ support_agent_card = AgentCard(
 # ROUTER AGENT (Orchestrator)
 # ======================================================================================
 # The Router agent doesn't run as an A2A server. Instead it is an orchestrator that
-# analyzes user queries and makes A2A calls to the specialist agents.
+# analyzes user queries and makes A2A calls to the specialist agents
 
 ROUTER_AGENT_INSTRUCTION = """
 You are the Router Agent - the orchestrator of the customer service system.
@@ -210,8 +210,8 @@ ALWAYS start responses with [ROUTER STEP 1]:
 # ======================================================================================
 # Module Export Shortcut
 # ======================================================================================
-
 # Setting a designation of all for easy importation of all the agents
+
 __all__ = [
     "customer_data_agent",
     "customer_data_agent_card",
