@@ -266,7 +266,7 @@ All required test scenarios are implemented in the `agent_to_agent_demo.ipynb`:
 ## Deliverables
 
 ### 1. Code Repository (GitHub)
-**Location**: https://github.com/bhstoller/multi-agent-customer-service
+**Location**: https://github.com/bhstoller/multi-agent-customer-service (this repository)
 
 - **MCP Server Implementation**: `src/mcp_server.py`
   - Flask server with 5 required tools
@@ -340,15 +340,15 @@ Status: active
    ```
 
 2. **Create virtual environment:**
-   ```bash
-   conda create -n multi-agent python=3.11
-   conda activate multi-agent
-   ```
+```bash
+   python3 -m venv venv
+   source venv/bin/activate
+```
 
 3. **Install dependencies:**
-   ```bash
+```bash
    pip install -r requirements.txt
-   ```
+```
 
 4. **Create `.env` file:**
    ```
