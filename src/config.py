@@ -82,7 +82,7 @@ CUSTOMER_DATA_AGENT_NAME = 'customer_data_agent'
 # ======================================================================================
 # This sets the logging level used
 
-LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'CRITCAL')
 
 
 # ======================================================================================
