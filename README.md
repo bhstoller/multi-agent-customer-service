@@ -2,7 +2,7 @@
 
 **Assignment: Multi-Agent Customer Service System with A2A and MCP**
 
-This repository houses all of the code and implementation for *Assignment #5: Multi-Agent Customer Service System with A2A and MCP*. This assignment was completed for the *Applied Generative AI Agents and Multimodal Intelligence* course at The University of Chicago. Specifically, this repository demonstrates coordinated multi-agent task allocation, MCP integration, and A2A protocol implementation using Google's Agent Development Kit (ADK) and A2A SDK.
+This repository houses all of the code and implementation for *Assignment #5: Multi-Agent Customer Service System with A2A and MCP*. This assignment was completed for the Applied Generative AI Agents and Multimodal Intelligence course at The University of Chicago. Specifically, this repository demonstrates coordinated multi-agent task allocation, MCP integration, and A2A protocol implementation using Google's Agent Development Kit (ADK) and A2A SDK.
 
 ---
 
