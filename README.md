@@ -1,7 +1,66 @@
 # Multi-Agent Customer Service System
 
 **Assignment: Multi-Agent Customer Service System with A2A and MCP**
-This repository was made to house all of the code and implementation for Assignment #5: Multi-Agent Customer Service System with A2A and MCP. This is part of Applied Generative AI Agents and Multimodal Intelligence course at The University of Chicago. Specifically, this repository demonstrates coordinated multi-agent task allocation, MCP integration, and A2A protocol implementation using Google's Agent Development Kit (ADK) and A2A SDK.
+
+This repository houses all of the code and implementation for Assignment #5: Multi-Agent Customer Service System with A2A and MCP. This assignment was completed for the Applied Generative AI Agents and Multimodal Intelligence course at The University of Chicago. Specifically, this repository demonstrates coordinated multi-agent task allocation, MCP integration, and A2A protocol implementation using Google's Agent Development Kit (ADK) and A2A SDK.
+
+---
+
+## How to Review This Work
+
+I have modularized all of the code into separate Python modules (`src/config.py`, `src/agents.py`, `src/router.py`, `src/mcp_server.py`) for production use. However, to make grading/review convenient, I have provided two equivalent ways to review my implementation:
+
+### Option 1: End-to-End Demo (Recommended for Quick Review)
+**File**: `agent_to_agent_demo.ipynb`
+
+`agent_to_agent_demo.ipynb` demonstrates the complete A2A system in action:
+- Imports and uses all of the the modularized code from `src/`
+- Starts the MCP server within the notebook
+- Executes all test scenarios
+- Shows A2A communication between agents in real-time
+- Shows final responses for all of the test queries
+
+The `agent_to_agent_demo.ipynb` is best for a quick review of the system working end-to-end, but since it imports the modularized code from `src/`, all the implementation details (MCP Tool setup, agent initialization, etc.) are hidden in the modules.
+
+### Option 2: Detailed Code Review (Recommended for Full Deep Dive)
+**Folder**: `notebooks/`
+- **`mcp_server_notebook.ipynb`**: Contains all the code from `src/mcp_server.py` and database configuration via the code cells in the Jupyter notebook
+- **`agent_to_agent_notebook.ipynb`**: Contains all the code from `src/agents.py`, `src/router.py`, and `src/config.py` via the code cells in the Jupyter notebook
+
+While these notebooks are **identical** to the modularized code in `src/`, they are just presented in notebook format for easier reviewing since every function, class, and implementation detail is visible in executable code cells.
+
+### Assignment Reflection
+**File**: `analysis.md`
+
+Lastly, as the per assignment requirements, `analysis.md` contains the 1-2 paragraphs reflection, covering:
+- Key lessons learned from building this multi-agent system
+- Challenges overcome and how I solved them
+
+---
+
+## Project Structure
+
+```
+multi-agent-customer-service/
+├── README.md                         # This file
+├── requirements.txt                  # Python dependencies
+├── analysis.md                       # Assignment reflection (lessons learned + challenges)
+├── .gitignore                        # Git configuration
+├── LICENSE                           # MIT license
+├── database_setup.py                 # Database initialization with test data (given)
+├── agent_to_agent_demo.ipynb         # End-to-end demo (START HERE!)
+│
+├── notebooks/                        # Detailed code review
+│   ├── mcp_server_notebook.ipynb     # MCP server code in cell format
+│   └── agent_to_agent_notebook.ipynb # Agents & router code in cell format
+│
+└── src/                              # Modularized code
+    ├── __init__.py
+    ├── config.py                    # Configuration & environment variables
+    ├── agents.py                    # Specialist agent definitions (Customer Data + Support)
+    ├── mcp_server.py               # MCP server with the five tools
+    └── router.py                   # A2A coordination (RouterOrchestrator + A2AClient)
+```
 
 ---
 
@@ -159,7 +218,7 @@ Implements intelligent routing:
 
 ## Test Scenarios
 
-All 5 required test scenarios are implemented in the `agent_to_agent_demo.ipynb`:
+All required test scenarios are implemented in the `agent_to_agent_demo.ipynb`:
 
 ### Scenario 1: Task Allocation
 **Query**: "Get customer information for customer ID 5"
@@ -225,10 +284,9 @@ All 5 required test scenarios are implemented in the `agent_to_agent_demo.ipynb`
   - `database_setup.py`: Database initialization
   - `requirements.txt`: All dependencies listed
 
-- **README.md** (this file)
-  - Complete setup instructions
-  - Python venv separation documented
-  - Clear requirements.txt with all packages
+- **Documentation**:
+  - `README.md` (this file): Complete setup and architecture
+  - `analysis.md`: Assignment reflection (lessons learned + challenges)
 
 ### 2. Colab Notebook
 **Location**: `agent_to_agent_demo.ipynb`
@@ -287,19 +345,19 @@ Status: active
    conda activate multi-agent
    ```
 
-1. **Install dependencies:**
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Create `.env` file:**
+4. **Create `.env` file:**
    ```
    GOOGLE_API_KEY=your_api_key_here
    MCP_SERVER_URL=http://localhost:10020/mcp
    NGROK_AUTHTOKEN=your_ngrok_token_here
    ```
 
-3. **Initialize database:**
+5. **Initialize database:**
    ```bash
    python database_setup.py
    ```
@@ -317,24 +375,4 @@ Status: active
 
 ---
 
-## Project Structure
-
-```
-multi-agent-customer-service/
-├── README.md                    # This file
-├── requirements.txt             # Python libraries
-├── .gitignore                   # Git configuration
-├── LICENSE                      # MIT License
-├── database_setup.py            # Creates database with test data
-├── agent_to_agent_demo.ipynb    # A2A demo with 3+ scenarios
-│
-└── src/                         # Python venv separation
-    ├── __init__.py
-    ├── config.py                # Part 1: Configuration
-    ├── agents.py                # Part 1: Agent definitions
-    ├── mcp_server.py            # Part 2: MCP server implementation
-    └── router.py                # Part 3: A2A coordination
-```
-
----
 *Assignment completed: November 2025*
