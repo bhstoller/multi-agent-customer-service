@@ -340,15 +340,15 @@ Status: active
    ```
 
 2. **Create virtual environment:**
-```bash
-   python3 -m venv venv
-   source venv/bin/activate
-```
+   ```bash
+      python3 -m venv venv
+      source venv/bin/activate
+   ```
 
 3. **Install dependencies:**
-```bash
-   pip install -r requirements.txt
-```
+   ```bash
+      pip install -r requirements.txt
+   ```
 
 4. **Create `.env` file:**
    ```
