@@ -1,21 +1,17 @@
 # Lessons Learned & Challenges
 
 ## What I Learned
-1. **Agent Coordination Complexity**: Managing state and information flow between agents requires careful planning. The A2A pattern provides good abstractions but demands explicit communication protocols.
 
-2. **MCP as a Bridge**: The MCP server acts as a critical interface between agents and external tools. Proper tool definition, error handling, and timeout management are essential for reliability.
+1. **Agent Coordination Requires Explicit Communication Protocols**: From this assignment, one of the main things I learned was that managing state and information flow between multiple agents is significantly more complex than a single agent. Without explicit logging at every coordination point and clear communication protocols between agents, debugging multi-agent systems was very difficult to do. While the A2A pattern provides good default instructions, the orchestrator had to be really strong in order to manage the conversation effectively.
 
-3. **LLM-Powered Routing**: Using an LLM to decide routing provides flexibility but requires careful prompt engineering to ensure agents are called appropriately and consistently.
+2. **MCP as a Critical Interface Layer**: I learned fairly early on into the assignment that the entire system relied on the MCP server, which had to be working for everyhting else to work as well. Specifically, proper tool definition, and timeout configurations were missing in my early attempts, which caused silent failures to cascade through my system. Thus, I learned that MCP tools need to be very well-defined with very clear error messages for debugging.
 
-4. **Debugging Multi-Agent Systems**: With multiple agents running asynchronously, debugging requires comprehensive logging at every coordination point. Without it, issues are nearly impossible to trace.
+3. **LLM-Powered Routing Demands Careful Prompt Engineering**: I also learned how helpful LLM tools are for helping decide which agents to call. Specifically, I found that LLMs responded well to structure (ie my prompt/instructions) and were therefore able to list available agents, provide clear decision criteria, and specify the output format. Before using the LLM (and a set of instructions), my first router would sometimes make different decisions for the same query.
 
 ## Challenges Overcome
-1. **A2A Communication**: Initial challenge was understanding the A2A SDK's HTTP communication pattern. Solved by implementing a robust `A2ASimpleClient` with proper timeout and error handling.
 
-2. **State Management**: Tracking information flow between agents (who knows what) was complex. Solved by maintaining message history and explicit logging of all agent calls.
+1. **Understanding the Router's Architecture**: The biggest challenge that I had to overcome was initially implementing the router as a `SequentialAgent`. However, I ultimately realized that this configuration wasn't the right approach, especially since it could not be given any instructions (prompting). However, I was able to solve this by switching to a `RouterOrchestrator` (a custom python class) with Gemini LLM for reasoning and `A2ASimpleClient` for agent communicationm, which ended up being clearer and more flexible than having the router be a specialist agent.
 
-3. **MCP Tool Reliability**: Tools occasionally timed out or failed silently. Solved by implementing comprehensive error handling, validation, and response formatting in each tool.
+2. **A2A Communication and Message Passing**: When starting the assignment, the A2A SDK's HTTP communication pattern wasn't very intuitive, and in my early attempts, I kept seeing my system fail silently or crash due to timeout misconfigurations. I ultimately solved this by building a more robust `A2ASimpleClient` with proper timeout configurations and agent card caching. Together, with explicit logging instructions, I was able to make debugging much easier.
 
-4. **ngrok URL Stability**: Ngrok tunnels would close between runs. Solved by implementing `ngrok.kill()` before creating new tunnels, ensuring clean connections.
-
-5. **Agent Consistency**: Agents sometimes made different decisions with similar queries. Solved by refining system instructions with concrete examples and constraints.
+3. **State Management Across Agents**: Lastly, tracking information flow between my specialist agents and ensuring that each of them had the necessary context for decisions was another big challenge early on. Specifically, my agents initially would lose track of information like customer IDs or forget to pass results between agents. However, I solved this by maintaining message history via the router (I required that all messages sent to Gemini included responses) and (again) adding logging at every coordination point.
