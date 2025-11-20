@@ -8,12 +8,12 @@ This repository houses all of the code and implementation for *Assignment #5: Mu
 
 ## How to Review This Work
 
-I have modularized all of the code into separate Python modules (`src/config.py`, `src/agents.py`, `src/router.py`, `src/mcp_server.py`) for production use. However, to make grading/review convenient, I have provided two equivalent ways to review my implementation:
+I have modularized all of the code into separate Python modules (`src/config.py`, `src/agents.py`, `src/router.py`, `src/mcp_server.py`). However, to make grading/review convenient, I have provided two equivalent ways to review my implementation:
 
 ### Option 1: End-to-End Demo (Recommended for Quick Review)
 **File**: `agent_to_agent_demo.ipynb`
 
-`agent_to_agent_demo.ipynb` demonstrates the complete A2A system in action:
+This notebook demonstrates the complete A2A system in action:
 - Imports and uses all of the the modularized code from `src/`
 - Starts the MCP server within the notebook
 - Executes all test scenarios
@@ -25,14 +25,14 @@ The `agent_to_agent_demo.ipynb` is best for a quick review of the system working
 ### Option 2: Detailed Code Review (Recommended for Full Deep Dive)
 **Folder**: `notebooks/`
 - **`mcp_server_notebook.ipynb`**: Contains all the code from `src/mcp_server.py` and database configuration via the code cells in the Jupyter notebook
-- **`agent_to_agent_notebook.ipynb`**: Contains all the code from `src/agents.py`, `src/router.py`, and `src/config.py` via the code cells in the Jupyter notebook
+- **`a2a_notebook.ipynb`**: Contains all the code from `src/agents.py`, `src/router.py`, and `src/config.py` via the code cells in the Jupyter notebook
 
 While these notebooks are **identical** to the modularized code in `src/`, they are just presented in notebook format for easier reviewing since every function, class, and implementation detail is visible in executable code cells.
 
 ### Assignment Reflection
 **File**: `analysis.md`
 
-Lastly, as the per assignment requirements, `analysis.md` contains the 1-2 paragraphs reflection, covering:
+Lastly, as the per assignment requirements, `analysis.md` contains the 1-2 paragraphs reflection covering:
 - Key lessons learned from building this multi-agent system
 - Challenges overcome and how I solved them
 
@@ -52,14 +52,14 @@ multi-agent-customer-service/
 │
 ├── notebooks/                        # Detailed code review
 │   ├── mcp_server_notebook.ipynb     # MCP server code in cell format
-│   └── agent_to_agent_notebook.ipynb # Agents & router code in cell format
+│   └── a2a_notebook.ipynb            # Agents & router code in cell format
 │
 └── src/                              # Modularized code
     ├── __init__.py
-    ├── config.py                    # Configuration & environment variables
-    ├── agents.py                    # Specialist agent definitions (Customer Data + Support)
-    ├── mcp_server.py               # MCP server with the five tools
-    └── router.py                   # A2A coordination (RouterOrchestrator + A2AClient)
+    ├── config.py                     # Configuration & environment variables
+    ├── agents.py                     # Specialist agent definitions (Customer Data + Support)
+    ├── mcp_server.py                 # MCP server with the five tools
+    └── router.py                     # A2A coordination (RouterOrchestrator + A2AClient)
 ```
 
 ---
