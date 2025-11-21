@@ -30,9 +30,9 @@ The `agent_to_agent_demo.ipynb` is best for a quick review of the system working
 While these notebooks are **identical** to the modularized code in `src/`, they are just presented in notebook format for easier reviewing since every function, class, and implementation detail is visible in executable code cells.
 
 ### Assignment Reflection
-**File**: `analysis.md`
+**File**: `conclusion.md`
 
-Lastly, as the per assignment requirements, `analysis.md` contains the 1-2 paragraphs reflection covering:
+Lastly, as the per assignment requirements, `conclusion.md` contains the 1-2 paragraphs reflection covering:
 - Key lessons learned from building this multi-agent system
 - Challenges overcome and how I solved them
 
@@ -44,7 +44,7 @@ Lastly, as the per assignment requirements, `analysis.md` contains the 1-2 parag
 multi-agent-customer-service/
 ├── README.md                         # This file
 ├── requirements.txt                  # Python dependencies
-├── analysis.md                       # Assignment reflection (lessons learned + challenges)
+├── conclusion.md                     # Assignment reflection (lessons learned + challenges)
 ├── .gitignore                        # Git configuration
 ├── LICENSE                           # MIT license
 ├── database_setup.py                 # Database initialization with test data (given)
@@ -286,7 +286,7 @@ All required test scenarios are implemented in the `agent_to_agent_demo.ipynb`:
 
 - **Documentation**:
   - `README.md` (this file): Complete setup and architecture
-  - `analysis.md`: Assignment reflection (lessons learned + challenges)
+  - `conclusion.md`: Assignment reflection (lessons learned + challenges)
 
 ### 2. Colab Notebook
 **Location**: `agent_to_agent_demo.ipynb`
