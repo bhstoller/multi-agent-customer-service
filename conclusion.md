@@ -56,6 +56,8 @@ This is the exact structure I implemented and is reflected in my final repositor
 ### 2. Router Agent Architecture
 
 **Prompt:**
+<br>
+
 > Im working on an assignment to build a multi-agent customer service system that has three main parts:
 > - Part 1: Three specialized agents - a Router/Orchestrator agent and two specialist agents (Customer Data Agent and Support Agent), each with detailed system instructions
 > - Part 2: An MCP server with 5 database tools (get_customer, list_customers, update_customer, create_ticket, get_customer_history) that the specialist agents (specifically the customer data agent) will call
@@ -178,6 +180,8 @@ This design is exactly what I implemented in `src/router.py` as the `RouterOrche
 ### 3. Code Modularization
 
 **Prompt:**
+<br>
+
 > I'm building a multi-agent customer service system for an assignment. The system has three main parts:
 > - Part 1: Three specialized agents - a Router/Orchestrator agent and two specialist agents (Customer Data Agent and Support Agent), each with detailed system instructions
 > - Part 2: An MCP server with 5 database tools (get_customer, list_customers, update_customer, create_ticket, get_customer_history) that the specialist agents (specifically the customer data agent) will call
@@ -349,6 +353,8 @@ As seen in my implementation, these are very similar to the prompts I used for b
 ## 5. README Documentation
 
 **Prompt:**
+<br>
+
 > I'm building a multi-agent customer service system for an assignment. The system has three main parts:
 > - Part 1: Three specialized agents - a Router/Orchestrator agent and two specialist agents (Customer Data Agent and Support Agent), each with detailed system instructions
 > - Part 2: An MCP server with 5 database tools (get_customer, list_customers, update_customer, create_ticket, get_customer_history) that the specialist agents (specifically the customer data agent) will call
@@ -386,6 +392,7 @@ As seen in my implementation, these are very similar to the prompts I used for b
 > Can you write me a README that touches on all these things?
 
 **Response:**
+<br>
 Absolulutely, I can definitely write a README about your project. Regarding the opening section, I will make sure to immediately clarify that code is modularized in `src/`, but explain that there are two options for viewing:
 
 - Option 1: Run `agent_to_agent_demo.ipynb` for end-to-end demo (imports modularized code, starts MCP server, executes test scenarios)
