@@ -16,7 +16,7 @@
 
 3. **State Management Across Agents**: Lastly, tracking information flow between my specialist agents and ensuring that each of them had the necessary context for decisions was another big challenge early on. Specifically, my agents initially would lose track of information like customer IDs or forget to pass results between agents. However, I solved this by maintaining message history via the router (I required that all messages sent to Gemini included responses) and (again) adding logging at every coordination point.
 
-## Generative AI (LLM) Usage: Queries and Prompts
+## Generative AI Usage: Exact Queries and Prompts
 For my project, I made a few major queries to Claude to help me with my assigment. Please see the queries and answers below:
 
 ### 1. Repository Organization
