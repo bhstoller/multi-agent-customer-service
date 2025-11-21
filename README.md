@@ -6,7 +6,7 @@ This repository houses all of the code and implementation for *Assignment #5: Mu
 
 ---
 
-## How to Review This Work
+## How to Review This Repository
 
 I have modularized all of the code into separate Python modules (`src/config.py`, `src/agents.py`, `src/router.py`, `src/mcp_server.py`). However, to make grading/review convenient, I have provided two equivalent ways to review my implementation:
 
