@@ -263,6 +263,7 @@ Ultimately, I used these files as a starting point, and applied my own custom fo
 Absolutely, writing prompts is one of the most important parts of an agentic system like you are building. Here are two prompts you can use for the instructions for your agents:
 
 **Customer Data Agent Instruction:**
+<br>
 CUSTOMER_DATA_AGENT_INSTRUCTION = """
 You are the Customer Data Agent.
 
@@ -297,6 +298,7 @@ ALWAYS start with [CUSTOMER_DATA_AGENT]: then provide JSON.
 """
 
 **Support Agent Instruction:**
+<br>
 SUPPORT_AGENT_INSTRUCTION = """
 You are the Support Agent.
 
